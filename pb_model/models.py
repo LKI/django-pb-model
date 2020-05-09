@@ -242,7 +242,7 @@ class ProtoBufMixin(six.with_metaclass(Meta, models.Model)):
         except AttributeError as e:
             LOGGER.error("Fail to serialize field: {} for {}. Error: {}".format(_dj_f_name, self._meta.model, e))
             raise DjangoPBModelError(
-                "Can't serialize Model({})'s field: {}. Err: {}".format(_dj_f_name, self._meta.model, e))
+                "Can't serialize Model({})'s field: {}. Err: {}".format(self._meta.model, _dj_f_name, e))
 
     def _to_proto_recursively(self, _pb_obj, _pb_dj_field_map, _dj_fields):
         for _pb_field in _pb_obj.DESCRIPTOR.fields:
@@ -282,7 +282,7 @@ class ProtoBufMixin(six.with_metaclass(Meta, models.Model)):
 
         """
         LOGGER.debug("Django Relation field, recursivly serializing")
-        if dj_field_type.many_to_many:
+        if dj_field_type.many_to_many or dj_field_type.one_to_many:
             self._m2m_to_protobuf(pb_obj, pb_field, dj_field_value)
         else:
             getattr(pb_obj, pb_field.name).CopyFrom(dj_field_value.to_pb())
